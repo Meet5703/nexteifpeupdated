@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import myUrl from "../URL/myUrl";
+import users from "./user";
 const Admin = () => {
   const rUrl = myUrl;
   const [formDataList, setFormDataList] = useState([]);
@@ -78,39 +79,93 @@ const Admin = () => {
       console.error("Error deleting data:", error);
     }
   };
+  useEffect(() => {
+    const storedLoggedIn = sessionStorage.getItem("loggedIn");
+    if (storedLoggedIn === "true") {
+      setLoggedIn(true);
+    }
+  }, []);
 
+  useEffect(() => {
+    sessionStorage.setItem("loggedIn", loggedIn);
+  }, [loggedIn]);
+
+  useEffect(() => {
+    if (loggedIn) {
+      fetchData();
+    }
+  }, [loggedIn]);
   const handleLogin = () => {
-    // Basic static login check (replace with a more secure mechanism)
-    if (username === "user" && password === "123") {
+    const user = users.find(
+      (user) => user.userName === username && user.userPassword === password
+    );
+    if (user) {
       setLoggedIn(true);
     } else {
       setLoggedIn(false);
       alert("Invalid credentials. Please try again.");
     }
   };
-
   if (!loggedIn) {
     return (
-      <div className="container mx-auto p-4">
-        <h1 className="text-4xl font-bold mb-4">Admin Login</h1>
-        <div className="mb-4">
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="p-2 border border-gray-300 mr-2"
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="p-2 border border-gray-300 mr-2"
-          />
-          <button onClick={handleLogin} className="bg-blue-500 text-white p-2">
-            Login
-          </button>
+      <div className="min-h-screen bg-gray-100 py-6 flex flex-col justify-center sm:py-12">
+        <div className="relative py-3 sm:max-w-xl sm:mx-auto">
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-sky-500 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
+          <div className="relative px-4 py-10 bg-white shadow-lg sm:rounded-3xl sm:p-20">
+            <div className="max-w-md mx-auto">
+              <div>
+                <h1 className="text-2xl font-semibold">Login</h1>
+              </div>
+              <div className="divide-y divide-gray-200">
+                <div className="py-8 text-base leading-6 space-y-4 text-gray-700 sm:text-lg sm:leading-7">
+                  <div className="relative">
+                    <input
+                      autoComplete="off"
+                      id="email"
+                      name="email"
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      className="rounded-lg peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-rose-600"
+                      placeholder="Email address"
+                    />
+                    <label
+                      htmlFor="email"
+                      className="absolute left-4 -top-3.5 text-gray-600 text-sm peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-440 peer-placeholder-shown:top-2 transition-all peer-focus:-top-5 peer-focus:text-gray-600 peer-focus:text-sm"
+                    >
+                      Email Address
+                    </label>
+                  </div>
+                  <div className="relative">
+                    <input
+                      autoComplete="off"
+                      id="password"
+                      name="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="rounded-lg p-5 peer placeholder-transparent h-10 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-rose-600"
+                      placeholder="Password"
+                    />
+                    <label
+                      htmlFor="password"
+                      className="absolute left-5 -top-3.5 text-gray-600 text-sm peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-440 peer-placeholder-shown:top-2 transition-all peer-focus:-top-5 peer-focus:text-gray-600 peer-focus:text-sm"
+                    >
+                      Password
+                    </label>
+                  </div>
+                  <div className="relative">
+                    <button
+                      onClick={handleLogin}
+                      className="bg-cyan-500 ml-20 text-white rounded-md px-5 py-1"
+                    >
+                      Submit
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -167,16 +222,16 @@ const Admin = () => {
             <th className="py-2 px-5 border-b">Acting Role</th>
             <th className="py-2 px-5 border-b">Mobile Number</th>
             <th className="py-2 px-5 border-b">WhatsApp Number</th>
-            <th className="py-2 px-5 border-b">Status</th>
-            <th className="py-2 px-5 border-b">Video Download</th>
-            <th className="py-2 px-5 border-b">Delete</th>
+            <th className="py-2 px-2 border-b">Status</th>
+            <th className="py-2 px-2 border-b">Videos</th>
+            <th className="py-2 px-2 border-b">Del</th>
             <th className="py-2 px-5 border-b">Created At</th>
           </tr>
         </thead>
         <tbody>
           {filteredData.map((formData) => (
             <tr key={formData.id} className="border-b">
-              <td className="text-[10px] py-2 px-2 ">{formData.ID}</td>
+              <td className="text-[10px]  py-2 px-2 ">{formData.ID}</td>
               <td className="text-[10px] py-2 px-2 ">{formData.Name}</td>
               <td className="text-[10px] py-2 px-2 ">{formData.FatherName}</td>
               <td className="text-[10px] py-2 px-2 ">{formData.MotherName}</td>
@@ -190,7 +245,7 @@ const Admin = () => {
                 {formData.WhatsAppNumber}
               </td>
               <td className="text-[10px] py-2 px-2 ">{formData.status}</td>
-              <td className="text-[10px] py-2 px-2 ">
+              <td className="text-[10px] py-2  ">
                 <a
                   href={generateDriveDownloadLink(formData.VideoUpload)} // Assuming VideoUpload holds the file ID
                   download
@@ -199,7 +254,7 @@ const Admin = () => {
                   Download
                 </a>
               </td>
-              <td className="text-[10px] py-2 px-2">
+              <td className="text-[10px] py-2 text-center">
                 <button
                   className="text-red-700"
                   onClick={() => handleDelete(formData.ID)}
@@ -234,7 +289,7 @@ const Admin = () => {
                   download
                   className="text-blue-500 hover:underline"
                 >
-                  Download
+                  +
                 </a>
               </td>
 
@@ -243,7 +298,7 @@ const Admin = () => {
                   className="text-red-700"
                   onClick={() => handleDelete(formData.ID)}
                 >
-                  Delete
+                  -
                 </button>
               </td>
               <td className="text-[10px] py-2 px-4">

@@ -1,3 +1,3 @@
-const myUrl = "https://eifpenextmail.onrender.com";
+const myUrl = "https://eifpe-bollywood.vercel.app";
 
 export default myUrl;

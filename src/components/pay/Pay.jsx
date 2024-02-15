@@ -30,18 +30,14 @@ const Pay = () => {
             ActingRole: latestSubmission.ActingRole
           });
         }
-      } catch (error) {
-        console.error("Error fetching submitted details:", error);
-      }
+      } catch (error) {}
     };
 
     fetchSubmittedDetails();
   }, []); // Empty dependency array to run the effect only once when the component mounts
   const makePayment = async (e) => {
     e.preventDefault();
-
     const transactionid = "Tr-" + uuidv4().toString(36).slice(-6);
-
     const payload = {
       merchantId: "PGTESTPAYUAT",
       merchantTransactionId: transactionid,
@@ -56,21 +52,13 @@ const Pay = () => {
       }
     };
     const dataPayload = JSON.stringify(payload);
-    console.log(dataPayload);
-
     const dataBase64 = Buffer.from(dataPayload).toString("base64");
-    console.log(dataBase64);
-
     const fullURL =
       dataBase64 + "/pg/v1/pay" + "099eb0cd-02cf-4e2a-8aca-3e6c6aff0399";
     const dataSha256 = sha256(fullURL);
-
     const checksum = dataSha256 + "###" + "1";
-    console.log("c====", checksum);
-
     const UAT_PAY_API_URL =
       " https://api-preprod.phonepe.com/apis/pg-sandbox/pg/v1/pay";
-
     const response = await axios.post(
       UAT_PAY_API_URL,
       {

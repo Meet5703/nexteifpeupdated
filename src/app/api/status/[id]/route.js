@@ -57,8 +57,9 @@ export async function POST(req, res) {
     }
   } catch (error) {
     console.error("Error in /api/payment:", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Internal server error" });
+    return NextResponse.json(
+      { success: false, message: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

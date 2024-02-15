@@ -1,11 +1,10 @@
 /* eslint-disable react/no-unescaped-entities */
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-// ./src/app/forms/page.jsx
 import React, { useEffect, useRef, useState } from "react";
-import "./text.css";
 import { NextResponse } from "next/server";
 import myUrl from "@/app/URL/myUrl";
+import "./text.css"; // Import CSS separately for better separation of concerns
 
 const MAX_VIDEO_SIZE_MB = 30;
 const MAX_VIDEO_DURATION_SECONDS = 30;
@@ -36,25 +35,26 @@ const Form = () => {
   }, [notificationRef.current]);
 
   const handleChange = (e) => {
-    if (e.target.name === "VideoUpload") {
-      setFormData({ ...formData, [e.target.name]: e.target.files[0] });
-    } else {
-      setFormData({ ...formData, [e.target.name]: e.target.value });
-    }
+    const { name, value, files } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: name === "VideoUpload" ? files[0] : value
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const data = new FormData();
+
+    const formDataToSend = new FormData();
     for (const key in formData) {
-      data.append(key, formData[key]);
+      formDataToSend.append(key, formData[key]);
     }
 
     try {
       const res = await fetch("/api/data", {
         method: "POST",
-        body: data // Use the FormData object directly
+        body: formDataToSend
       });
 
       if (res.ok) {
@@ -77,7 +77,7 @@ const Form = () => {
 
   return (
     <div>
-      {loading ? ( // Render loading screen if loading is true
+      {loading ? (
         <div>Loading...</div>
       ) : (
         <div
@@ -93,7 +93,6 @@ const Form = () => {
             </div>
           )}
           <form
-            action="/payment"
             className="bgblr"
             encType="multipart/form-data"
             onSubmit={handleSubmit}

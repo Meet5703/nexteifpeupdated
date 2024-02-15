@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import React, { useEffect, useState } from "react";
+import logoimg from "../../assets/GettyImages-138596308-ad71719.webp";
 import axios from "axios";
 let html2pdf;
 
@@ -9,6 +10,7 @@ if (typeof window !== "undefined") {
 }
 // ...
 import myUrl from "../URL/myUrl";
+import Image from "next/image";
 const Page = () => {
   const rUrl = myUrl;
   const [data, setData] = useState({
@@ -41,11 +43,7 @@ const Page = () => {
       }
     };
 
-    const fetchData = async () => {
-      await fetchSubmittedDetails();
-      downloadPDF();
-    };
-    fetchData();
+    fetchSubmittedDetails(); // Call fetchSubmittedDetails immediately
   }, []);
 
   const handleUpdateData = async () => {
@@ -61,15 +59,27 @@ const Page = () => {
       console.error("Error updating data:", error);
     }
   };
+
+  useEffect(() => {
+    if (data.ID) {
+      // Check if data is available before calling downloadPDF
+      downloadPDF();
+    }
+  }, [data.ID]);
+
+  let isPDFDownloaded = false; // Define isPDFDownloaded outside downloadPDF function
+
   const downloadPDF = async () => {
     try {
+      if (isPDFDownloaded) return; // Check if PDF has already been downloaded
+
       const element = document.getElementById("pdf-content");
       const pdfBlob = await html2pdf(element, {
         margin: 10,
         filename: "receipt.pdf",
         image: { type: "jpeg", quality: 0.98 },
         html2canvas: { scale: 2 },
-        jsPDF: { unit: "mm", format: "a4", orientation: "landscape" }
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
       });
 
       const pdfDataURL = await new Promise((resolve) => {
@@ -82,10 +92,13 @@ const Page = () => {
       link.href = pdfDataURL;
       link.download = "receipt.pdf";
       link.click();
+
+      isPDFDownloaded = true; // Set the flag to indicate PDF has been downloaded
     } catch (error) {
       console.error("Error generating and downloading PDF:", error);
     }
   };
+
   handleUpdateData();
 
   return (
@@ -95,12 +108,31 @@ const Page = () => {
           id="pdf-content"
           className=" bg-blue-100 h-fit col-start-3 col-end-11 p-8"
         >
-          <div className="w-full flex flex-col items-center">
+          <div className="w-full flex justify-around items-center">
+            <Image
+              src={logoimg}
+              alt="logo"
+              className="w-[100px] h-[100px] rounded-full"
+              width={100}
+              height={100}
+            />
             <h1 className="text-xl md:text-3xl uppercase font-bold ">
-              Reicept Of Application
+              E.I.F.P.E
+            </h1>
+            <Image
+              src={logoimg}
+              alt="logo"
+              className="w-[100px] h-[100px] rounded-full"
+              width={100}
+              height={100}
+            />
+          </div>
+          <div className="w-full flex justify-around items-center">
+            <h1 className="text-xl md:text-3xl uppercase font-bold ">
+              Receipt Of Application
             </h1>
           </div>
-          <div className="w-full flex justify-between items-center mt-20">
+          <div className="w-full flex justify-between items-center mt-20 bg-white border border-black p-6">
             <div className="text-justify w-fit">
               <h1 className="uppercase font-bold text-lg md:text-xl">
                 Application Details
@@ -114,7 +146,7 @@ const Page = () => {
             </div>
             <div className="w-1/4">
               <h1 className="uppercase font-bold text-lg md:text-xl">
-                address
+                Address
               </h1>
               <p>
                 Lorem ipsum dolor sit, amet consectetur adipisicing elit.
@@ -122,41 +154,54 @@ const Page = () => {
               </p>
             </div>
           </div>
-          <div className="mt-20">
+          <div className="mt-20 bg-white p-8 border border-black">
             <h1 className="uppercase font-bold text-lg md:text-xl text-center">
               Details Of Purchase
             </h1>
+
             <br />
-            <h1 className="px-10">Items Purchesed</h1>
-            <hr />
+            <div className="flex justify-between">
+              <h1 className="px-10 text-xl font-semibold">Items Purchased</h1>
+              <h1 className="px-10 text-xl font-semibold">Amount</h1>
+            </div>
             <br />
-            <div className="space-y-3">
-              <div className="flex justify-between px-10">
+
+            <div className="space-y-3 border border-black">
+              <div className="flex justify-between px-10  py-3 ">
                 <h1>Apply Form Fees </h1>
                 <h1>1000Rs.</h1>
               </div>
-              <div className="flex justify-between px-10">
+              <hr className="border-b-0 border-black" />
+              <div className="flex justify-between py-3 px-10">
                 <h1>Audition Fees </h1>
                 <h1>5000Rs.</h1>
               </div>
             </div>
             <br />
-            <hr />
             <div>
               <div className="flex justify-between px-10">
                 <h1>Total Amt. </h1>
                 <h1>6000Rs.</h1>
               </div>
-              <div className="mt-5 flex justify-center">
-                <button
-                  onClick={downloadPDF}
-                  className="bg-green-500 text-white px-4 py-2 rounded"
-                >
-                  Download PDF
-                </button>
-              </div>
             </div>
           </div>
+          <div className="mt-14 bg-white p-4 border border-black">
+            <h1 className="text-center text-xl font-bold underline">
+              Contact us
+            </h1>
+            <div className="flex justify-between">
+              <span>Ph.1 :- 7985350778</span>
+              <span>Ph.2 :- 8853518482</span>
+            </div>
+          </div>
+        </div>
+        <div className="mt-5 flex justify-center row-start-2 col-start-10">
+          <button
+            onClick={downloadPDF}
+            className="bg-green-500 text-white px-4 py-2 rounded"
+          >
+            Download PDF
+          </button>
         </div>
       </div>
     </div>
