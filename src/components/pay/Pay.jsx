@@ -102,7 +102,7 @@ const Pay = () => {
               htmlFor="Name"
               className="block text-sm font-medium leading-6 text-gray-900"
             >
-              ID
+              Name
             </label>
             <div className="mt-2">
               <input
